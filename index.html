@@ -56,9 +56,10 @@ function updateAirQualityTable() {
     { town: 'Stratford, CT', latitude: 41.15181, longitude: -73.10334 },
     { town: 'Waterbury, CT', latitude: 41.550427, longitude: -73.043652 },
     { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
-    // Add more towns if needed
   ];
 
+  townData.sort((a, b) => a.town.localeCompare(b.town));
+  
   const tableBody = document.getElementById('tableBody');
   tableBody.innerHTML = '';
 

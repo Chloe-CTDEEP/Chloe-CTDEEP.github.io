@@ -88,25 +88,41 @@ function updateAirQualityTable() {
         o3Cell.textContent = o3Aqi;
 
         // Update cell color based on AQI value
-        const aqiValue = parseInt(pm25Aqi); // Convert AQI to an integer
-        let cellColor = '';
+        const pm25AqiValue = parseInt(pm25Aqi);
+        const o3AqiValue = parseInt(o3Aqi);
+        let pm25CellColor = '';
+        let o3CellColor = '';
 
-        if (aqiValue >= 0 && aqiValue <= 50) {
-          cellColor = 'green';
-        } else if (aqiValue >= 51 && aqiValue <= 100) {
-          cellColor = 'yellow';
-        } else if (aqiValue >= 101 && aqiValue <= 150) {
-          cellColor = 'orange';
-        } else if (aqiValue >= 151 && aqiValue <= 200) {
-          cellColor = 'red';
-        } else if (aqiValue >= 201 && aqiValue <= 300) {
-          cellColor = 'purple';
-        } else if (aqiValue >= 301) {
-          cellColor = 'maroon';
+        if (pm25AqiValue >= 0 && pm25AqiValue <= 50) {
+          pm25CellColor = 'green';
+        } else if (pm25AqiValue >= 51 && pm25AqiValue <= 100) {
+          pm25CellColor = 'yellow';
+        } else if (pm25AqiValue >= 101 && pm25AqiValue <= 150) {
+          pm25CellColor = 'orange';
+        } else if (pm25AqiValue >= 151 && pm25AqiValue <= 200) {
+          pm25CellColor = 'red';
+        } else if (pm25AqiValue >= 201 && pm25AqiValue <= 300) {
+          pm25CellColor = 'purple';
+        } else if (pm25AqiValue >= 301) {
+          pm25CellColor = 'maroon';
         }
 
-        pm25Cell.style.backgroundColor = cellColor; // Update cell color
-        o3Cell.textContent = o3Aqi; // You can update the color for the 'o3Cell' in a similar manner
+        if (o3AqiValue >= 0 && o3AqiValue <= 50) {
+          o3CellColor = 'green';
+        } else if (o3AqiValue >= 51 && o3AqiValue <= 100) {
+          o3CellColor = 'yellow';
+        } else if (o3AqiValue >= 101 && o3AqiValue <= 150) {
+          o3CellColor = 'orange';
+        } else if (o3AqiValue >= 151 && o3AqiValue <= 200) {
+          o3CellColor = 'red';
+        } else if (o3AqiValue >= 201 && o3AqiValue <= 300) {
+          o3CellColor = 'purple';
+        } else if (o3AqiValue >= 301) {
+          o3CellColor = 'maroon';
+        }
+
+        pm25Cell.style.backgroundColor = pm25CellColor;
+        o3Cell.style.backgroundColor = o3CellColor;
 
         row.appendChild(townCell);
         row.appendChild(pm25Cell);

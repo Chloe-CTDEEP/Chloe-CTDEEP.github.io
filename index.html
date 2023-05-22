@@ -34,8 +34,20 @@
     const distance = 25; // Distance in miles for nearest monitoring stations
     const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; // Replace with your AirNow API key
 
+    // Function to format date as YYYY-MM-DD
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     // Function to fetch data from AirNow API and update the table
     function updateAirQualityTable() {
+      const today = new Date();
+      const formattedDate = formatDate(today);
+      document.getElementById('dateHeader').textContent = formattedDate;
+
       fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&distance=${distance}&API_KEY=${apiKey}`)
         .then(response => response.json())
         .then(data => {

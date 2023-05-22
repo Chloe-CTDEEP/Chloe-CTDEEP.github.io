@@ -13,7 +13,7 @@
   </style>
 </head>
 <body>
-  <h1 id="tableTitle">Predicted Daily AQI Maximums for<br></h1>
+  <h1 id="tableTitle">Predicted Daily AQI Maximums for</h1>
   <table id="airQualityTable">
     <thead>
       <tr>
@@ -40,7 +40,7 @@
     function updateAirQualityTable() {
       const today = new Date();
       const formattedDate = formatDate(today);
-      document.getElementById('tableTitle').innerHTML = `Predicted Daily AQI Maximums for<br>${formattedDate}`;
+      document.getElementById('tableTitle').innerHTML = `Predicted Daily AQI Maximums for${formattedDate}`;
 
       const townData = [
         { town: 'Bridgeport, CT', zipCode: '06604' },

@@ -40,7 +40,7 @@
     function updateAirQualityTable() {
       const today = new Date();
       const formattedDate = formatDate(today);
-      document.getElementById('tableTitle').innerHTML = `Predicted Daily AQI Maximums for${formattedDate}`;
+      document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
 
       const townData = [
         { town: 'Bridgeport, CT', zipCode: '06604' },

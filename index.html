@@ -37,75 +37,93 @@
     }
 
 // Function to fetch data from AirNow API and update the table
-function updateAirQualityTable() {
-  const today = new Date();
-  const formattedDate = today.toISOString().slice(0, 10);
-  document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
+    function updateAirQualityTable() {
+      const today = new Date();
+      const formattedDate = today.toISOString().slice(0, 10);
+      document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
 
-  const townData = [
-    { town: 'Bridgeport, CT', latitude: 41.170866, longitude: -73.194778 },
-    { town: 'Cornwall, CT', latitude: 41.8634, longitude: -73.3382 },
-    { town: 'Danbury, CT', latitude: 41.399153, longitude: -73.443032 },
-    { town: 'East Hartford, CT', latitude: 41.74259, longitude: -72.63433 },
-    { town: 'Greenwich, CT', latitude: 41.004657, longitude: -73.585128 },
-    { town: 'Groton, CT', latitude: 41.353475, longitude: -72.078855 },
-    { town: 'Madison, CT', latitude: 41.256788, longitude: -72.553270 },
-    { town: 'Middletown, CT', latitude: 41.55224, longitude: -72.63004 },
-    { town: 'New Haven, CT', latitude: 41.301157, longitude: -72.902887 },
-    { town: 'Stafford, CT', latitude: 41.975678, longitude: -72.386744 },
-    { town: 'Stratford, CT', latitude: 41.15181, longitude: -73.10334 },
-    { town: 'Waterbury, CT', latitude: 41.550427, longitude: -73.043652 },
-    { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
-  ];
+      const townData = [
+        { town: 'Bridgeport, CT', latitude: 41.170866, longitude: -73.194778 },
+        { town: 'Cornwall, CT', latitude: 41.8634, longitude: -73.3382 },
+        { town: 'Danbury, CT', latitude: 41.399153, longitude: -73.443032 },
+        { town: 'East Hartford, CT', latitude: 41.74259, longitude: -72.63433 },
+        { town: 'Greenwich, CT', latitude: 41.004657, longitude: -73.585128 },
+        { town: 'Groton, CT', latitude: 41.353475, longitude: -72.078855 },
+        { town: 'Madison, CT', latitude: 41.256788, longitude: -72.553270 },
+        { town: 'Middletown, CT', latitude: 41.55224, longitude: -72.63004 },
+        { town: 'New Haven, CT', latitude: 41.301157, longitude: -72.902887 },
+        { town: 'Stafford, CT', latitude: 41.975678, longitude: -72.386744 },
+        { town: 'Stratford, CT', latitude: 41.15181, longitude: -73.10334 },
+        { town: 'Waterbury, CT', latitude: 41.550427, longitude: -73.043652 },
+        { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
+      ];
 
-  townData.sort((a, b) => a.town.localeCompare(b.town));
-  
-  const tableBody = document.getElementById('tableBody');
-  tableBody.innerHTML = '';
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = '';
 
-  townData.forEach(town => {
-    fetch(`${apiUrl}?format=application/json&latitude=${town.latitude}&longitude=${town.longitude}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
-      .then(response => response.json())
-      .then(data => {
-        let pm25Aqi = '';
-        let o3Aqi = '';
+      townData.forEach(town => {
+        fetch(`${apiUrl}?format=application/json&latitude=${town.latitude}&longitude=${town.longitude}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
+          .then(response => response.json())
+          .then(data => {
+            let pm25Aqi = '';
+            let o3Aqi = '';
 
-        if (data.length > 0) {
-          data.forEach(forecast => {
-            if (forecast.DateForecast === formattedDate) {
-              if (town.town === 'Bridgeport, CT' && forecast.ParameterName === 'O3') {
-                o3Aqi = forecast.AQI;
-              } else if (town.town === 'Greenwich, CT' && forecast.ParameterName === 'PM2.5') {
-                pm25Aqi = forecast.AQI;
-              } else if (
-                (town.town === 'Madison, CT' || town.town === 'Middletown, CT' || town.town === 'Stafford, CT' ||
-                  town.town === 'Stratford, CT' || town.town === 'Waterbury, CT') &&
-                forecast.ParameterName === 'PM2.5'
-              ) {
-                pm25Aqi = forecast.AQI;
-              }
+            if (data.length > 0) {
+              data.forEach(forecast => {
+                if (forecast.DateForecast === formattedDate) {
+                  if (town.town === 'Bridgeport, CT' && forecast.ParameterName === 'O3') {
+                    o3Aqi = forecast.AQI;
+                  } else if (town.town === 'Greenwich, CT' && forecast.ParameterName === 'PM2.5') {
+                    pm25Aqi = forecast.AQI;
+                  } else if (
+                    (town.town === 'Madison, CT' || town.town === 'Middletown, CT' || town.town === 'Stafford, CT' ||
+                      town.town === 'Stratford, CT' || town.town === 'Waterbury, CT') &&
+                    forecast.ParameterName === 'PM2.5'
+                  ) {
+                    pm25Aqi = forecast.AQI;
+                  }
+                }
+              });
             }
+
+            const row = document.createElement('tr');
+            const townCell = document.createElement('td');
+            townCell.textContent = town.town;
+            const pm25Cell = document.createElement('td');
+            pm25Cell.textContent = pm25Aqi !== '' ? pm25Aqi : '-';
+            const o3Cell = document.createElement('td');
+            o3Cell.textContent = o3Aqi !== '' ? o3Aqi : '-';
+
+            row.appendChild(townCell);
+            row.appendChild(pm25Cell);
+            row.appendChild(o3Cell);
+            tableBody.appendChild(row);
+          })
+          .catch(error => {
+            console.log(`Error fetching air quality data for ${town.town}:`, error);
           });
-        }
-
-        const row = document.createElement('tr');
-        const townCell = document.createElement('td');
-        townCell.textContent = town.town;
-        const pm25Cell = document.createElement('td');
-        pm25Cell.textContent = pm25Aqi;
-        const o3Cell = document.createElement('td');
-        o3Cell.textContent = o3Aqi;
-
-        row.appendChild(townCell);
-        row.appendChild(pm25Cell);
-        row.appendChild(o3Cell);
-        tableBody.appendChild(row);
-      })
-      .catch(error => {
-        console.log(`Error fetching air quality data for ${town.town}:`, error);
       });
-  });
-}
+            
+      Promise.all(fetchDataPromises)
+        .then(data => {
+          data.sort((a, b) => a.town.town.localeCompare(b.town.town));
+
+          data.forEach(({ town, pm25Aqi, o3Aqi }) => {
+            const row = document.createElement('tr');
+            const townCell = document.createElement('td');
+            townCell.textContent = town.town;
+            const pm25Cell = document.createElement('td');
+            pm25Cell.textContent = pm25Aqi !== '' ? pm25Aqi : '-';
+            const o3Cell = document.createElement('td');
+            o3Cell.textContent = o3Aqi !== '' ? o3Aqi : '-';
+
+            row.appendChild(townCell);
+            row.appendChild(pm25Cell);
+            row.appendChild(o3Cell);
+            tableBody.appendChild(row);
+          });
+        });
+    }
 
     // Initial table update
     updateAirQualityTable();

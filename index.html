@@ -58,11 +58,11 @@ function updateAirQualityTable() {
         let pm25Aqi = 'NA';
         let o3Aqi = 'NA';
 
-        if (data.length > 0) {
+         if (data.length > 0) {
           data.forEach(forecast => {
-            if (forecast.ParameterName === 'PM2.5') {
+            if (forecast.ParameterName === 'PM2.5' && forecast.DateForecast === formattedDate) {
               pm25Aqi = forecast.AQI;
-            } else if (forecast.ParameterName === 'O3') {
+            } else if (forecast.ParameterName === 'O3' && forecast.DateForecast === formattedDate) {
               o3Aqi = forecast.AQI;
             }
           });

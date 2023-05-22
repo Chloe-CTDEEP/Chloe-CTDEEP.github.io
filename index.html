@@ -58,8 +58,13 @@
             let o3Aqi = 'NA';
 
             if (data.length > 0) {
-              pm25Aqi = data[0].AQI;
-              o3Aqi = data[1].AQI;
+              for (const forecast of data) {
+                if (forecast.ParameterName === 'PM2.5') {
+                  pm25Aqi = forecast.AQI;
+                } else if (forecast.ParameterName === 'O3') {
+                  o3Aqi = forecast.AQI;
+                }
+              }
             }
 
             const row = document.createElement('tr');

@@ -62,6 +62,8 @@ function updateAirQualityTable() {
   tableBody.innerHTML = '';
 
   townData.sort((a, b) => a.town.localeCompare(b.town));
+const tableBody = document.getElementById('tableBody');
+  tableBody.innerHTML = '';
   
   townData.forEach(town => {
     fetch(`${apiUrl}?format=application/json&latitude=${town.latitude}&longitude=${town.longitude}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)

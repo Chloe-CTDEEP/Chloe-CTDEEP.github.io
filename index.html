@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
   <title>Air Quality Table</title>
@@ -13,70 +12,72 @@
   </style>
 </head>
 <body>
-  <h1>Air Quality Table</h1>
+  <h1 id="tableTitle">Predicted Daily AQI Maximums for</h1>
   <table id="airQualityTable">
     <thead>
       <tr>
-        <th>Date</th>
-        <th>AQI</th>
-        <th>Category</th>
-        <th>PM2.5 (µg/m³)</th>
+        <th>Town</th>
+        <th>Fine Particles (PM2.5)</th>
+        <th>Ozone (O3)</th>
       </tr>
     </thead>
     <tbody id="tableBody"></tbody>
   </table>
-  
-<script>
-    // AirNow API URL and parameters
-    const apiUrl = 'https://www.airnowapi.org/aq/observation/latLong/current/';
-    const latitude = 40.7128; // Example latitude (New York City)
-    const longitude = -74.0060; // Example longitude (New York City)
-    const distance = 25; // Distance in miles for nearest monitoring stations
-    const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; // Replace with your AirNow API key
 
-    // Function to format date as YYYY-MM-DD
+  <script>
+    // AirNow API URL and parameters
+    const apiUrl = 'https://www.airnowapi.org/aq/forecast/zipCode/';
+    const apiKey = 'YOUR_API_KEY'; // Replace with your AirNow API key
+
+    // Function to format date as "Day, Month DD, YYYY"
     function formatDate(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      return date.toLocaleDateString(undefined, options);
     }
 
     // Function to fetch data from AirNow API and update the table
     function updateAirQualityTable() {
       const today = new Date();
       const formattedDate = formatDate(today);
-      document.getElementById('dateHeader').textContent = formattedDate;
+      document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
 
-      fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&distance=${distance}&API_KEY=${apiKey}`)
-        .then(response => response.json())
-        .then(data => {
-          const tableBody = document.getElementById('tableBody');
-          tableBody.innerHTML = '';
+      const townData = [
+        { town: 'Bridgeport, CT', zipCode: '06604' },
+        { town: 'Cornwall, CT', zipCode: '06754' }
+      ];
 
-          data.forEach(entry => {
-            const { DateObserved, AQI, Category, PM2_5Value } = entry;
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = '';
+
+      townData.forEach(town => {
+        fetch(`${apiUrl}?format=application/json&zipCode=${town.zipCode}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
+          .then(response => response.json())
+          .then(data => {
+            let pm25Aqi = 'NA';
+            let o3Aqi = 'NA';
+
+            if (data.length > 0) {
+              pm25Aqi = data[0].AQI;
+              o3Aqi = data[1].AQI;
+            }
 
             const row = document.createElement('tr');
-            const dateCell = document.createElement('td');
-            dateCell.textContent = DateObserved;
-            const aqiCell = document.createElement('td');
-            aqiCell.textContent = AQI;
-            const categoryCell = document.createElement('td');
-            categoryCell.textContent = Category;
+            const townCell = document.createElement('td');
+            townCell.textContent = town.town;
             const pm25Cell = document.createElement('td');
-            pm25Cell.textContent = PM2_5Value;
+            pm25Cell.textContent = pm25Aqi;
+            const o3Cell = document.createElement('td');
+            o3Cell.textContent = o3Aqi;
 
-            row.appendChild(dateCell);
-            row.appendChild(aqiCell);
-            row.appendChild(categoryCell);
+            row.appendChild(townCell);
             row.appendChild(pm25Cell);
+            row.appendChild(o3Cell);
             tableBody.appendChild(row);
+          })
+          .catch(error => {
+            console.log(`Error fetching air quality data for ${town.town}:`, error);
           });
-        })
-        .catch(error => {
-          console.log('Error fetching air quality data:', error);
-        });
+      });
     }
 
     // Initial table update

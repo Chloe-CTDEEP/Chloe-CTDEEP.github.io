@@ -28,7 +28,7 @@
   <script>
     // AirNow API URL and parameters
     const apiUrl = 'https://www.airnowapi.org/aq/forecast/latLong/';
-    const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; // Replace with your AirNow API key
+    const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; 
 
     // Function to format date as "Day, Month DD, YYYY"
     function formatDate(date) {
@@ -61,6 +61,8 @@ function updateAirQualityTable() {
   const tableBody = document.getElementById('tableBody');
   tableBody.innerHTML = '';
 
+  townData.sort((a, b) => a.town.localeCompare(b.town));
+  
   townData.forEach(town => {
     fetch(`${apiUrl}?format=application/json&latitude=${town.latitude}&longitude=${town.longitude}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
       .then(response => response.json())

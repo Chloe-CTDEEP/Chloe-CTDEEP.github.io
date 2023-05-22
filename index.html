@@ -39,7 +39,7 @@
 // Function to fetch data from AirNow API and update the table
 function updateAirQualityTable() {
   const today = new Date();
-  const formattedDate = formatDate(today);
+  const formattedDate = today.toISOString().slice(0, 10);
   document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
 
   const townData = [

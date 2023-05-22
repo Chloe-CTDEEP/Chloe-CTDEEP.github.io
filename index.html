@@ -96,28 +96,6 @@ function updateAirQualityTable() {
         console.log(`Error fetching air quality data for ${town.town}:`, error);
       });
   });
-  
-  Promise.all(fetchDataPromises)
-  .then(data => {
-    data.sort((a, b) => a.town.town.localeCompare(b.town.town));
-
-    data.forEach(({ town, pm25Aqi, o3Aqi }) => {
-      const row = document.createElement('tr');
-      const townCell = document.createElement('td');
-      townCell.textContent = town.town;
-      const pm25Cell = document.createElement('td');
-      pm25Cell.textContent = (town.town === 'Greenwich, CT' || town.town === 'Madison, CT' ||
-        town.town === 'Middletown, CT' || town.town === 'Stafford, CT' ||
-        town.town === 'Stratford, CT') && pm25Aqi === '' ? '' : pm25Aqi;
-      const o3Cell = document.createElement('td');
-      o3Cell.textContent = (town.town === 'Bridgeport, CT' || town.town === 'Waterbury, CT') && o3Aqi === '' ? '' : o3Aqi;
-
-      row.appendChild(townCell);
-      row.appendChild(pm25Cell);
-      row.appendChild(o3Cell);
-      tableBody.appendChild(row);
-    });
-  });
 }
 
     // Initial table update

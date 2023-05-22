@@ -87,6 +87,27 @@ function updateAirQualityTable() {
         const o3Cell = document.createElement('td');
         o3Cell.textContent = o3Aqi;
 
+        // Update cell color based on AQI value
+        const aqiValue = parseInt(pm25Aqi); // Convert AQI to an integer
+        let cellColor = '';
+
+        if (aqiValue >= 0 && aqiValue <= 50) {
+          cellColor = 'green';
+        } else if (aqiValue >= 51 && aqiValue <= 100) {
+          cellColor = 'yellow';
+        } else if (aqiValue >= 101 && aqiValue <= 150) {
+          cellColor = 'orange';
+        } else if (aqiValue >= 151 && aqiValue <= 200) {
+          cellColor = 'red';
+        } else if (aqiValue >= 201 && aqiValue <= 300) {
+          cellColor = 'purple';
+        } else if (aqiValue >= 301) {
+          cellColor = 'maroon';
+        }
+
+        pm25Cell.style.backgroundColor = cellColor; // Update cell color
+        o3Cell.textContent = o3Aqi; // You can update the color for the 'o3Cell' in a similar manner
+
         row.appendChild(townCell);
         row.appendChild(pm25Cell);
         row.appendChild(o3Cell);

@@ -43,15 +43,15 @@ function updateAirQualityTable() {
   document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
 
   const townData = [
-    { town: 'Bridgeport, CT', zipCode: '06604' },
-    { town: 'Cornwall, CT', zipCode: '06754' }
+    { town: 'Bridgeport, CT', latitude: 41.1908, longitude: -73.2153 },
+    { town: 'Cornwall, CT', latitude: 41.8634, longitude: -73.3382 }
   ];
 
   const tableBody = document.getElementById('tableBody');
   tableBody.innerHTML = '';
 
   townData.forEach(town => {
-    fetch(`${apiUrl}?format=application/json&zipCode=${town.zipCode}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
+    fetch(`${apiUrl}?format=application/json&latitude=${town.latitude}&longitude=${town.longitude}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
       .then(response => response.json())
       .then(data => {
         let pm25Aqi = 'NA';

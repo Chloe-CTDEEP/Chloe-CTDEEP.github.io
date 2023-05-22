@@ -25,3 +25,53 @@
     </thead>
     <tbody id="tableBody"></tbody>
   </table>
+  
+<script>
+    // AirNow API URL and parameters
+    const apiUrl = 'https://www.airnowapi.org/aq/observation/latLong/current/';
+    const latitude = 40.7128; // Example latitude (New York City)
+    const longitude = -74.0060; // Example longitude (New York City)
+    const distance = 25; // Distance in miles for nearest monitoring stations
+    const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; // Replace with your AirNow API key
+
+    // Function to fetch data from AirNow API and update the table
+    function updateAirQualityTable() {
+      fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&distance=${distance}&API_KEY=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.getElementById('tableBody');
+          tableBody.innerHTML = '';
+
+          data.forEach(entry => {
+            const { DateObserved, AQI, Category, PM2_5Value } = entry;
+
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            dateCell.textContent = DateObserved;
+            const aqiCell = document.createElement('td');
+            aqiCell.textContent = AQI;
+            const categoryCell = document.createElement('td');
+            categoryCell.textContent = Category;
+            const pm25Cell = document.createElement('td');
+            pm25Cell.textContent = PM2_5Value;
+
+            row.appendChild(dateCell);
+            row.appendChild(aqiCell);
+            row.appendChild(categoryCell);
+            row.appendChild(pm25Cell);
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.log('Error fetching air quality data:', error);
+        });
+    }
+
+    // Initial table update
+    updateAirQualityTable();
+
+    // Periodic table updates every 5 minutes (300000 milliseconds)
+    setInterval(updateAirQualityTable, 300000);
+  </script>
+</body>
+</html>

@@ -58,10 +58,8 @@ function updateAirQualityTable() {
     { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
   ];
 
-  const tableBody = document.getElementById('tableBody');
-  tableBody.innerHTML = '';
-
-  townData.sort((a, b) => a.town.localeCompare(b.town));
+townData.sort((a, b) => a.town.localeCompare(b.town));
+  
 const tableBody = document.getElementById('tableBody');
   tableBody.innerHTML = '';
   

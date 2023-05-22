@@ -67,16 +67,23 @@ function updateAirQualityTable() {
     fetch(`${apiUrl}?format=application/json&latitude=${town.latitude}&longitude=${town.longitude}&date=${formattedDate}&distance=25&API_KEY=${apiKey}`)
       .then(response => response.json())
       .then(data => {
-        let pm25Aqi = 'NA';
-        let o3Aqi = 'NA';
+        let pm25Aqi = '';
+        let o3Aqi = '';
 
         if (data.length > 0) {
           data.forEach(forecast => {
-            const forecastDate = forecast.DateForecast.trim(); // Trim any extra whitespace
-            if (forecast.ParameterName === 'PM2.5' && forecastDate === formattedDate) {
-              pm25Aqi = forecast.AQI;
-            } else if (forecast.ParameterName === 'O3' && forecastDate === formattedDate) {
-              o3Aqi = forecast.AQI;
+            if (forecast.DateForecast === formattedDate) {
+              if (town.town === 'Bridgeport, CT' && forecast.ParameterName === 'O3') {
+                o3Aqi = forecast.AQI;
+              } else if (town.town === 'Greenwich, CT' && forecast.ParameterName === 'PM2.5') {
+                pm25Aqi = forecast.AQI;
+              } else if (
+                (town.town === 'Madison, CT' || town.town === 'Middletown, CT' || town.town === 'Stafford, CT' ||
+                  town.town === 'Stratford, CT' || town.town === 'Waterbury, CT') &&
+                forecast.ParameterName === 'PM2.5'
+              ) {
+                pm25Aqi = forecast.AQI;
+              }
             }
           });
         }

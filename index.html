@@ -86,22 +86,20 @@ async function getAirQualityData(latitude, longitude) {
   }
 
   // Function to update the table with cached or API-fetched data
-async function updateAirQualityTable() {
-  const today = new Date();
-  let formattedDate = today.toISOString().slice(0, 10);
-  const formattedToday = formatDate(today); // Format for the first table header
+  async function updateAirQualityTable() {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const formattedTodayHeader = `${formattedToday.split(',')[0]}, ${formattedToday.split(',')[1].trim()} ${formattedToday.split(',')[2]}`;
+    let formattedDate = today.toISOString().slice(0, 10);
+    const formattedToday = formatDate(today); // Format for the first table header
+    const formattedTomorrow = formatDate(tomorrow); // Format for the second table header
 
-  document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedTodayHeader}`;
+    const formattedTodayHeader = `${formattedToday.split(',')[0]}, ${formattedToday.split(',')[1].trim()} ${formattedToday.split(',')[2]}`;
+    const formattedTomorrowHeader = `${formattedTomorrow.split(',')[0]}, ${formattedTomorrow.split(',')[1].trim()} ${formattedTomorrow.split(',')[2]}`;
 
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const formattedTomorrow = formatDate(tomorrow); // Format for the second table header
-
-  const formattedTomorrowHeader = `${formattedTomorrow.split(',')[0]}, ${formattedTomorrow.split(',')[1].trim()} ${formattedTomorrow.split(',')[2]}`;
-
-  document.getElementById('tomorrowTitle').textContent = `Predicted Daily AQI Maximums for ${formattedTomorrowHeader}`;
+    document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedTodayHeader}`;
+    document.getElementById('tomorrowTitle').textContent = `Predicted Daily AQI Maximums for ${formattedTomorrowHeader}`;
 
 
     const townData = [
@@ -121,25 +119,25 @@ async function updateAirQualityTable() {
       { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
     ];
 
-    const todayTableBody = document.getElementById('todayTableBody');
-    const tomorrowTableBody = document.getElementById('tomorrowTableBody');
+  const todayTableBody = document.getElementById('todayTableBody');
+  const tomorrowTableBody = document.getElementById('tomorrowTableBody');
 
-    for (const town of townData) {
-      const todayData = await getAirQualityData(town.latitude, town.longitude, formattedDate);
-      const tomorrowData = await getAirQualityData(town.latitude, town.longitude, formattedTomorrow);
+  for (const town of townData) {
+    const todayData = await getAirQualityData(town.latitude, town.longitude, formattedDate);
+    const tomorrowData = await getAirQualityData(town.latitude, town.longitude, tomorrow.toISOString().slice(0, 10));
 
-      const todayRow = createTableRow(town.town, todayData);
-      todayTableBody.appendChild(todayRow);
+    const todayRow = createTableRow(town.town, todayData);
+    todayTableBody.appendChild(todayRow);
 
-      if (tomorrowData.length > 0) {
-        const tomorrowRow = createTableRow(town.town, tomorrowData);
-        tomorrowTableBody.appendChild(tomorrowRow);
-      } else {
-        const tomorrowMessageRow = createMessageRow('Tomorrow\'s forecast is not yet available');
-        tomorrowTableBody.appendChild(tomorrowMessageRow);
-      }
+    if (tomorrowData.length > 0) {
+      const tomorrowRow = createTableRow(town.town, tomorrowData);
+      tomorrowTableBody.appendChild(tomorrowRow);
+    } else {
+      const tomorrowMessageRow = createMessageRow('Tomorrow\'s forecast is not yet available');
+      tomorrowTableBody.appendChild(tomorrowMessageRow);
     }
   }
+}
 
   // Function to create a table row with data
 function createTableRow(town, data) {

@@ -49,11 +49,26 @@
   }
 
   // Function to fetch data from the AirNow API
-  async function fetchAirQualityData(latitude, longitude, date) {
-    const response = await fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&date=${date}&distance=25&API_KEY=${apiKey}`);
-    const data = await response.json();
-    return data;
+async function fetchAirQualityData(latitude, longitude) {
+  const response = await fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&date=&distance=25&API_KEY=${apiKey}`);
+  const data = await response.json();
+  return data;
+}
+
+// Function to fetch data from cache or API
+async function getAirQualityData(latitude, longitude) {
+  const cacheKey = `${latitude}-${longitude}`;
+
+  // Check if data is already cached
+  if (localStorage.getItem(cacheKey)) {
+    return JSON.parse(localStorage.getItem(cacheKey));
   }
+
+  // If data is not cached, fetch from API and store in cache
+  const data = await fetchAirQualityData(latitude, longitude);
+  localStorage.setItem(cacheKey, JSON.stringify(data));
+  return data;
+}
 
   // Function to fetch data from cache or API
   async function getAirQualityData(latitude, longitude, date) {
@@ -65,7 +80,7 @@
     }
 
     // If data is not cached, fetch from API and store in cache
-    const data = await fetchAirQualityData(latitude, longitude, date);
+    const data = await fetchAirQualityData(latitude, longitude);
     localStorage.setItem(cacheKey, JSON.stringify(data));
     return data;
   }

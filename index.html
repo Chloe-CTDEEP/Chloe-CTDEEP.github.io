@@ -129,11 +129,11 @@ async function getAirQualityData(latitude, longitude) {
     const todayRow = createTableRow(town.town, todayData);
     todayTableBody.appendChild(todayRow);
 
+    const tomorrowRow = createTableRow(town.town, tomorrowData);
     if (tomorrowData.length > 0) {
-      const tomorrowRow = createTableRow(town.town, tomorrowData);
       tomorrowTableBody.appendChild(tomorrowRow);
     } else {
-      const tomorrowMessageRow = createMessageRow('Tomorrow\'s forecast is not yet available');
+      const tomorrowMessageRow = createMessageRow("Tomorrow's forecast is not yet available");
       tomorrowTableBody.appendChild(tomorrowMessageRow);
     }
   }

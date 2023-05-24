@@ -14,7 +14,7 @@
 </head>
 <body>
   <h1 id="tableTitle">Predicted Daily AQI Maximums for</h1>
-  <table id="airQualityTable">
+  <table id="todayTable">
     <thead>
       <tr>
         <th>Town</th>
@@ -22,147 +22,179 @@
         <th>Ozone (O3)</th>
       </tr>
     </thead>
-    <tbody id="tableBody"></tbody>
+    <tbody id="todayTableBody"></tbody>
+  </table>
+
+  <h1 id="tomorrowTitle"></h1>
+  <table id="tomorrowTable">
+    <thead>
+      <tr>
+        <th>Town</th>
+        <th>Fine Particles (PM2.5)</th>
+        <th>Ozone (O3)</th>
+      </tr>
+    </thead>
+    <tbody id="tomorrowTableBody"></tbody>
   </table>
 
   <script>
-    // AirNow API URL and parameters
-    const apiUrl = 'https://www.airnowapi.org/aq/forecast/latLong/';
-    const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; 
+  // AirNow API URL and parameters
+  const apiUrl = 'https://www.airnowapi.org/aq/forecast/latLong/';
+  const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; 
 
-    // Function to format date as "Day, Month DD, YYYY"
-    function formatDate(date) {
-      const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-      return date.toLocaleDateString(undefined, options);
+  // Function to format date as "Day, Month DD, YYYY"
+  function formatDate(date) {
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+
+  // Function to fetch data from the AirNow API
+  async function fetchAirQualityData(latitude, longitude, date) {
+    const response = await fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&date=${date}&distance=25&API_KEY=${apiKey}`);
+    const data = await response.json();
+    return data;
+  }
+
+  // Function to fetch data from cache or API
+  async function getAirQualityData(latitude, longitude, date) {
+    const cacheKey = `${latitude}-${longitude}-${date}`;
+
+    // Check if data is already cached
+    if (localStorage.getItem(cacheKey)) {
+      return JSON.parse(localStorage.getItem(cacheKey));
     }
 
-    // Function to fetch data from the AirNow API
-    async function fetchAirQualityData(latitude, longitude, date) {
-      const response = await fetch(`${apiUrl}?format=application/json&latitude=${latitude}&longitude=${longitude}&date=${date}&distance=25&API_KEY=${apiKey}`);
-      const data = await response.json();
-      return data;
-    }
+    // If data is not cached, fetch from API and store in cache
+    const data = await fetchAirQualityData(latitude, longitude, date);
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+    return data;
+  }
 
-    // Function to fetch data from cache or API
-    async function getAirQualityData(latitude, longitude, date) {
-      const cacheKey = `${latitude}-${longitude}-${date}`;
+  // Function to update the table with cached or API-fetched data
+  async function updateAirQualityTable() {
+    const today = new Date();
+    const formattedDate = today.toISOString().slice(0, 10);
+    document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
 
-      // Check if data is already cached
-      if (localStorage.getItem(cacheKey)) {
-        return JSON.parse(localStorage.getItem(cacheKey));
-      }
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const formattedTomorrow = tomorrow.toISOString().slice(0, 10);
+    document.getElementById('tomorrowTitle').textContent = `Predicted Daily AQI Maximums for ${formatDate(tomorrow)}`;
 
-      // If data is not cached, fetch from API and store in cache
-      const data = await fetchAirQualityData(latitude, longitude, date);
-      localStorage.setItem(cacheKey, JSON.stringify(data));
-      return data;
-    }
+    const townData = [
+      { town: 'Bridgeport, CT', latitude: 41.170866, longitude: -73.194778 },
+      { town: 'Cornwall, CT', latitude: 41.8634, longitude: -73.3382 },
+      { town: 'Danbury, CT', latitude: 41.399153, longitude: -73.443032 },
+      { town: 'East Hartford, CT', latitude: 41.74259, longitude: -72.63433 },
+      { town: 'Hartford, CT', latitude: 41.771444, longitude: -72.679923 },
+      { town: 'Greenwich, CT', latitude: 41.004657, longitude: -73.585128 },
+      { town: 'Groton, CT', latitude: 41.353475, longitude: -72.078855 },
+      { town: 'Madison, CT', latitude: 41.256788, longitude: -72.55327 },
+      { town: 'Middletown, CT', latitude: 41.55224, longitude: -72.63004 },
+      { town: 'New Haven, CT', latitude: 41.301157, longitude: -72.902887 },
+      { town: 'Stafford, CT', latitude: 41.975678, longitude: -72.386744 },
+      { town: 'Stratford, CT', latitude: 41.15181, longitude: -73.10334 },
+      { town: 'Waterbury, CT', latitude: 41.550427, longitude: -73.043652 },
+      { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
+    ];
 
-    // Function to update the table with cached or API-fetched data
-    async function updateAirQualityTable() {
-      const today = new Date();
-      const formattedDate = today.toISOString().slice(0, 10);
-      document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
+    const todayTableBody = document.getElementById('todayTableBody');
+    const tomorrowTableBody = document.getElementById('tomorrowTableBody');
 
-      const townData = [
-        { town: 'Bridgeport, CT', latitude: 41.170866, longitude: -73.194778 },
-        { town: 'Cornwall, CT', latitude: 41.8634, longitude: -73.3382 },
-        { town: 'Danbury, CT', latitude: 41.399153, longitude: -73.443032 },
-        { town: 'East Hartford, CT', latitude: 41.74259, longitude: -72.63433 },
-        { town: 'Hartford, CT', latitude: 41.771444, longitude: -72.679923 },
-        { town: 'Greenwich, CT', latitude: 41.004657, longitude: -73.585128 },
-        { town: 'Groton, CT', latitude: 41.353475, longitude: -72.078855 },
-        { town: 'Madison, CT', latitude: 41.256788, longitude: -72.55327 },
-        { town: 'Middletown, CT', latitude: 41.55224, longitude: -72.63004 },
-        { town: 'New Haven, CT', latitude: 41.301157, longitude: -72.902887 },
-        { town: 'Stafford, CT', latitude: 41.975678, longitude: -72.386744 },
-        { town: 'Stratford, CT', latitude: 41.15181, longitude: -73.10334 },
-        { town: 'Waterbury, CT', latitude: 41.550427, longitude: -73.043652 },
-        { town: 'Westport, CT', latitude: 41.118228, longitude: -73.336753 }
-      ];
+    for (const town of townData) {
+      const todayData = await getAirQualityData(town.latitude, town.longitude, formattedDate);
+      const tomorrowData = await getAirQualityData(town.latitude, town.longitude, formattedTomorrow);
 
-      const tableBody = document.getElementById('tableBody');
-      tableBody.textContent = '';
+      const todayRow = createTableRow(town.town, todayData);
+      todayTableBody.appendChild(todayRow);
 
-      try {
-        for (const town of townData) {
-          const data = await getAirQualityData(town.latitude, town.longitude, formattedDate);
-
-          let pm25Aqi = 'NA';
-          let o3Aqi = 'NA';
-
-          if (data.length > 0) {
-            const pm25Forecast = data.find(forecast => forecast.ParameterName === 'PM2.5' && forecast.DateForecast.trim() === formattedDate);
-            const o3Forecast = data.find(forecast => forecast.ParameterName === 'O3' && forecast.DateForecast.trim() === formattedDate);
-
-            if (pm25Forecast) {
-              pm25Aqi = pm25Forecast.AQI;
-            }
-            if (o3Forecast) {
-              o3Aqi = o3Forecast.AQI;
-            }
-          }
-
-          const row = document.createElement('tr');
-          const townCell = document.createElement('td');
-          townCell.textContent = town.town;
-          const pm25Cell = document.createElement('td');
-          pm25Cell.textContent = pm25Aqi;
-          const o3Cell = document.createElement('td');
-          o3Cell.textContent = o3Aqi;
-
-          // Update cell color based on AQI value
-          const pm25AqiValue = parseInt(pm25Aqi);
-          const o3AqiValue = parseInt(o3Aqi);
-          let pm25CellColor = '';
-          let o3CellColor = '';
-
-          if (pm25AqiValue >= 0 && pm25AqiValue <= 50) {
-            pm25CellColor = 'lightgreen';
-          } else if (pm25AqiValue >= 51 && pm25AqiValue <= 100) {
-            pm25CellColor = 'yellow';
-          } else if (pm25AqiValue >= 101 && pm25AqiValue <= 150) {
-            pm25CellColor = 'orange';
-          } else if (pm25AqiValue >= 151 && pm25AqiValue <= 200) {
-            pm25CellColor = 'red';
-          } else if (pm25AqiValue >= 201 && pm25AqiValue <= 300) {
-            pm25CellColor = 'purple';
-          } else if (pm25AqiValue >= 301) {
-            pm25CellColor = 'maroon';
-          }
-
-          if (o3AqiValue >= 0 && o3AqiValue <= 50) {
-            o3CellColor = 'lightgreen';
-          } else if (o3AqiValue >= 51 && o3AqiValue <= 100) {
-            o3CellColor = 'yellow';
-          } else if (o3AqiValue >= 101 && o3AqiValue <= 150) {
-            o3CellColor = 'orange';
-          } else if (o3AqiValue >= 151 && o3AqiValue <= 200) {
-            o3CellColor = 'red';
-          } else if (o3AqiValue >= 201 && o3AqiValue <= 300) {
-            o3CellColor = 'purple';
-          } else if (o3AqiValue >= 301) {
-            o3CellColor = 'maroon';
-          }
-
-          pm25Cell.style.backgroundColor = pm25CellColor;
-          o3Cell.style.backgroundColor = o3CellColor;
-
-          row.appendChild(townCell);
-          row.appendChild(pm25Cell);
-          row.appendChild(o3Cell);
-          tableBody.appendChild(row);
-        }
-      } catch (error) {
-        console.log('Error:', error);
+      if (tomorrowData.length > 0) {
+        const tomorrowRow = createTableRow(town.town, tomorrowData);
+        tomorrowTableBody.appendChild(tomorrowRow);
+      } else {
+        const tomorrowMessageRow = createMessageRow('Tomorrow\'s forecast is not yet available');
+        tomorrowTableBody.appendChild(tomorrowMessageRow);
       }
     }
+  }
 
-    // Initial table update
-    updateAirQualityTable();
+  // Function to create a table row with data
+function createTableRow(town, data) {
+  const row = document.createElement('tr');
+  const townCell = document.createElement('td');
+  townCell.textContent = town;
 
-    // Periodic table updates every 1 hour
-    setInterval(updateAirQualityTable, 3600000);
-  </script>
+  const pm25Cell = document.createElement('td');
+  const o3Cell = document.createElement('td');
+
+  const pm25Data = data.find(item => item.ParameterName === 'PM2.5');
+  const o3Data = data.find(item => item.ParameterName === 'O3');
+
+  const pm25Aqi = pm25Data ? pm25Data.AQI : 'N/A';
+  const o3Aqi = o3Data ? o3Data.AQI : 'N/A';
+
+  // Update cell color based on AQI value
+  const pm25AqiValue = parseInt(pm25Aqi);
+  const o3AqiValue = parseInt(o3Aqi);
+  let pm25CellColor = '';
+  let o3CellColor = '';
+
+  if (pm25AqiValue >= 0 && pm25AqiValue <= 50) {
+    pm25CellColor = 'lightgreen';
+  } else if (pm25AqiValue >= 51 && pm25AqiValue <= 100) {
+    pm25CellColor = 'yellow';
+  } else if (pm25AqiValue >= 101 && pm25AqiValue <= 150) {
+    pm25CellColor = 'orange';
+  } else if (pm25AqiValue >= 151 && pm25AqiValue <= 200) {
+    pm25CellColor = 'red';
+  } else if (pm25AqiValue >= 201 && pm25AqiValue <= 300) {
+    pm25CellColor = 'purple';
+  } else if (pm25AqiValue >= 301) {
+    pm25CellColor = 'maroon';
+  }
+
+  if (o3AqiValue >= 0 && o3AqiValue <= 50) {
+    o3CellColor = 'lightgreen';
+  } else if (o3AqiValue >= 51 && o3AqiValue <= 100) {
+    o3CellColor = 'yellow';
+  } else if (o3AqiValue >= 101 && o3AqiValue <= 150) {
+    o3CellColor = 'orange';
+  } else if (o3AqiValue >= 151 && o3AqiValue <= 200) {
+    o3CellColor = 'red';
+  } else if (o3AqiValue >= 201 && o3AqiValue <= 300) {
+    o3CellColor = 'purple';
+  } else if (o3AqiValue >= 301) {
+    o3CellColor = 'maroon';
+  }
+
+  pm25Cell.textContent = pm25Aqi;
+  o3Cell.textContent = o3Aqi;
+
+  pm25Cell.style.backgroundColor = pm25CellColor;
+  o3Cell.style.backgroundColor = o3CellColor;
+
+  row.appendChild(townCell);
+  row.appendChild(pm25Cell);
+  row.appendChild(o3Cell);
+
+  return row;
+}
+
+  // Function to create a table row with a message
+  function createMessageRow(message) {
+    const row = document.createElement('tr');
+    const messageCell = document.createElement('td');
+    messageCell.setAttribute('colspan', '3');
+    messageCell.textContent = message;
+    row.appendChild(messageCell);
+    return row;
+  }
+
+  // Initial table update
+  updateAirQualityTable();
+
+  // Periodic table updates every 1 hour
+  setInterval(updateAirQualityTable, 3600000);
+</script>
 </body>
 </html>

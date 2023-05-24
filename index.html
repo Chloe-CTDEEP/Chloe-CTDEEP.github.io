@@ -71,15 +71,21 @@
   }
 
   // Function to update the table with cached or API-fetched data
-  async function updateAirQualityTable() {
-    const today = new Date();
-    const formattedDate = today.toISOString().slice(0, 10);
-    document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedDate}`;
+async function updateAirQualityTable() {
+  const today = new Date();
+  const formattedToday = formatDate(today); // Format for both table headers
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const formattedTomorrow = tomorrow.toISOString().slice(0, 10);
-    document.getElementById('tomorrowTitle').textContent = `Predicted Daily AQI Maximums for ${formatDate(tomorrow)}`;
+  const formattedTodayHeader = `${formattedToday.split(',')[0]}, ${formattedToday.split(',')[1].trim()} ${formattedToday.split(',')[2]}`;
+
+  document.getElementById('tableTitle').textContent = `Predicted Daily AQI Maximums for ${formattedTodayHeader}`;
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const formattedTomorrow = formatDate(tomorrow); // Format for the second table header
+
+  const formattedTomorrowHeader = `${formattedTomorrow.split(',')[0]}, ${formattedTomorrow.split(',')[1].trim()} ${formattedTomorrow.split(',')[2]}`;
+
+  document.getElementById('tomorrowTitle').textContent = `Predicted Daily AQI Maximums for ${formattedTomorrowHeader}`;
 
     const townData = [
       { town: 'Bridgeport, CT', latitude: 41.170866, longitude: -73.194778 },

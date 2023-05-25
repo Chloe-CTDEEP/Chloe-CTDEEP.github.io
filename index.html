@@ -40,7 +40,7 @@
   <script>
   // AirNow API URL and parameters
   const apiUrl = 'https://www.airnowapi.org/aq/forecast/latLong/';
-  const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597'; 
+  const apiKey = '860173AA-E019-4D82-9A97-FA4630A41597';
 
   // Function to format date as "Day, Month DD, YYYY"
   function formatDate(date) {
@@ -55,22 +55,7 @@
     return data;
   }
 
-  // Function to fetch data from cache or API
-  async function getAirQualityData(latitude, longitude, date) {
-    const cacheKey = `${latitude}-${longitude}-${date}`;
-
-    // Check if data is already cached
-    if (localStorage.getItem(cacheKey)) {
-      return JSON.parse(localStorage.getItem(cacheKey));
-    }
-
-    // If data is not cached, fetch from API and store in cache
-    const data = await fetchAirQualityData(latitude, longitude, date);
-    localStorage.setItem(cacheKey, JSON.stringify(data));
-    return data;
-  }
-
-  // Function to update the table with cached or API-fetched data
+  // Function to update the table with API-fetched data
   async function updateAirQualityTable() {
     const today = new Date();
     const tomorrow = new Date(today);
@@ -107,8 +92,8 @@
     const tomorrowTableBody = document.getElementById('tomorrowTableBody');
 
     for (const town of townData) {
-      const todayData = await getAirQualityData(town.latitude, town.longitude, formattedDate);
-      const tomorrowData = await getAirQualityData(town.latitude, town.longitude, tomorrow.toISOString().slice(0, 10));
+      const todayData = await fetchAirQualityData(town.latitude, town.longitude, formattedDate);
+      const tomorrowData = await fetchAirQualityData(town.latitude, town.longitude, tomorrow.toISOString().slice(0, 10));
 
       const todayRow = createTableRow(town.town, todayData);
       todayTableBody.appendChild(todayRow);
@@ -124,66 +109,66 @@
   }
 
   // Function to create a table row with data
-function createTableRow(town, data) {
-  const row = document.createElement('tr');
-  const townCell = document.createElement('td');
-  townCell.textContent = town;
+  function createTableRow(town, data) {
+    const row = document.createElement('tr');
+    const townCell = document.createElement('td');
+    townCell.textContent = town;
 
-  const pm25Cell = document.createElement('td');
-  const o3Cell = document.createElement('td');
+    const pm25Cell = document.createElement('td');
+    const o3Cell = document.createElement('td');
 
-  const pm25Data = data.find(item => item.ParameterName === 'PM2.5');
-  const o3Data = data.find(item => item.ParameterName === 'O3');
+    const pm25Data = data.find(item => item.ParameterName === 'PM2.5');
+    const o3Data = data.find(item => item.ParameterName === 'O3');
 
-  const pm25Aqi = pm25Data ? pm25Data.AQI : 'N/A';
-  const o3Aqi = o3Data ? o3Data.AQI : 'N/A';
+    const pm25Aqi = pm25Data ? pm25Data.AQI : 'N/A';
+    const o3Aqi = o3Data ? o3Data.AQI : 'N/A';
 
-  // Update cell color based on AQI value
-  const pm25AqiValue = parseInt(pm25Aqi);
-  const o3AqiValue = parseInt(o3Aqi);
-  let pm25CellColor = '';
-  let o3CellColor = '';
+    // Update cell color based on AQI value
+    const pm25AqiValue = parseInt(pm25Aqi);
+    const o3AqiValue = parseInt(o3Aqi);
+    let pm25CellColor = '';
+    let o3CellColor = '';
 
-  if (pm25AqiValue >= 0 && pm25AqiValue <= 50) {
-    pm25CellColor = 'lightgreen';
-  } else if (pm25AqiValue >= 51 && pm25AqiValue <= 100) {
-    pm25CellColor = 'yellow';
-  } else if (pm25AqiValue >= 101 && pm25AqiValue <= 150) {
-    pm25CellColor = 'orange';
-  } else if (pm25AqiValue >= 151 && pm25AqiValue <= 200) {
-    pm25CellColor = 'red';
-  } else if (pm25AqiValue >= 201 && pm25AqiValue <= 300) {
-    pm25CellColor = 'purple';
-  } else if (pm25AqiValue >= 301) {
-    pm25CellColor = 'maroon';
+    if (pm25AqiValue >= 0 && pm25AqiValue <= 50) {
+      pm25CellColor = 'lightgreen';
+    } else if (pm25AqiValue >= 51 && pm25AqiValue <= 100) {
+      pm25CellColor = 'yellow';
+    } else if (pm25AqiValue >= 101 && pm25AqiValue <= 150) {
+      pm25CellColor = 'orange';
+    } else if (pm25AqiValue >= 151 && pm25AqiValue <= 200) {
+      pm25CellColor = 'red';
+    } else if (pm25AqiValue >= 201 && pm25AqiValue <= 300) {
+      pm25CellColor = 'purple';
+    } else if (pm25AqiValue >= 301) {
+      pm25CellColor = 'maroon';
+    }
+
+    if (o3AqiValue >= 0 && o3AqiValue <= 50) {
+      o3CellColor = 'lightgreen';
+    } else if (o3AqiValue >= 51 && o3AqiValue <= 100) {
+      o3CellColor = 'yellow';
+    } else if (o3AqiValue >= 101 && o3AqiValue <= 150) {
+      o3CellColor = 'orange';
+    } else if (o3AqiValue >= 151 && o3AqiValue <= 200) {
+      o3CellColor = 'red';
+    } else if (o3AqiValue >= 201 && o3AqiValue <= 300) {
+      o3CellColor = 'purple';
+    } else if (o3AqiValue >= 301) {
+      o3CellColor = 'maroon';
+    }
+
+    pm25Cell.textContent = pm25Aqi;
+    o3Cell.textContent = o3Aqi;
+
+    pm25Cell.style.backgroundColor = pm25CellColor;
+    o3Cell.style.backgroundColor = o3CellColor;
+
+    row.appendChild(townCell);
+    row.appendChild(pm25Cell);
+    row.appendChild(o3Cell);
+
+    return row;
   }
-
-  if (o3AqiValue >= 0 && o3AqiValue <= 50) {
-    o3CellColor = 'lightgreen';
-  } else if (o3AqiValue >= 51 && o3AqiValue <= 100) {
-    o3CellColor = 'yellow';
-  } else if (o3AqiValue >= 101 && o3AqiValue <= 150) {
-    o3CellColor = 'orange';
-  } else if (o3AqiValue >= 151 && o3AqiValue <= 200) {
-    o3CellColor = 'red';
-  } else if (o3AqiValue >= 201 && o3AqiValue <= 300) {
-    o3CellColor = 'purple';
-  } else if (o3AqiValue >= 301) {
-    o3CellColor = 'maroon';
-  }
-
-  pm25Cell.textContent = pm25Aqi;
-  o3Cell.textContent = o3Aqi;
-
-  pm25Cell.style.backgroundColor = pm25CellColor;
-  o3Cell.style.backgroundColor = o3CellColor;
-
-  row.appendChild(townCell);
-  row.appendChild(pm25Cell);
-  row.appendChild(o3Cell);
-
-  return row;
-}
 
   // Function to create a table row with a message
   function createMessageRow(message) {
